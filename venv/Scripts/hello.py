@@ -26,12 +26,23 @@ terror.rename(columns={'iyear':'Year','imonth':'Month',
 	'nkill':'Killed','nwound':'Wounded','summary':'Summary',
 	'gname':'Group','targtype1_txt':'Target_type',
 	'weaptype1_txt':'Weapon_type','motive':'Motive'},inplace=True)
+#terror_Group = terror['Group'].astype(str)
+terror_Group = terror[['Killed', 'Group']]
+
+terror_Group =terror_Group[terror_Group.Group != 'Unknown']
+terror_Group = terror_Group.groupby('Group').count().reset_index()
+terror_Group['Killed'] = terror_Group['Killed'].astype(float)
+terror_Group = terror_Group.sort_values(by='Killed',ascending=False, na_position='last', ignore_index=True)
+
 terror['Year'] = terror['Year'].astype(float)
 terror['Killed'] = terror['Killed'].astype(float)
 terror = terror.drop(['Month', 'Day', 'approxdate'], axis=1)
 terror = terror.groupby('Year').count().reset_index()
+#terror_Group = terror.groupby('Group').sum().reset_index()
+
 #terror = terror.pivot_table(terror, index=['Year', ])
 terror = terror.head(48)
+terror_Group = terror_Group.head(10)
 #terror.drop(['Month','Day', 'Country','Region','AttackType','Target','Killed',
 #	'Wounded','Summary','Group','Target_type','Weapon_type','Motive'],axis=1)
 #terror.drop(['Summary', 'Region', 'Motive', 'Weapon_type', 'Group', 'Target_type', 'Country','AttackType', 'Target', 'Killed', 'Wounded'], axis=1)
@@ -43,8 +54,11 @@ app = Flask(__name__)
 def result():
 	chart_data = terror.to_dict(orient='records')
 	chart_data = json.dumps(chart_data, indent=2)
+	chart_data_group = terror_Group.to_dict()
+	chart_data_group = json.dumps(chart_data_group, indent=2)
+	data_group = {'chart_data_group' : chart_data_group}
 	data = {'chart_data': chart_data}
-	return render_template('result.html', data=data)
+	return render_template('result.html', data=data, data_group=data_group)
 
 
 @app.route('/bar')

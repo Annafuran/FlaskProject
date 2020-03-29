@@ -47,10 +47,14 @@
    		<div id="graphDiv">
 			<script src="http://d3js.org/d3.v3.min.js"></script>
    				<script>  		
-			 		var graphData = {{ data.chart_data | safe}}	 	 
+			 		//Graph: Killed over years
+			 		var graphData = {{ data.chart_data | safe}}	 
+			 		//Graph: List over most dangerous groups
+			 		var graphData_group = {{ data_group.chart_data_group | safe}}	 	 
 			 	   	
-			 	   	console.log(graphData);
+			 	   	console.log(graphData_group);
 
+			 	   	//Graph: Killed over years
 			 	   	var margin = {top: 30, right: 50, bottom: 30, left: 50};
 					var svgWidth = 600;
 					var svgHeight = 270;
@@ -67,22 +71,11 @@
 
 					var killLine = d3.svg.line()
 					.x(function(d) { return x(d.Year); })
-					.y(function(d) { return y(d.Killed); });
-
-
-					
-	
-					/*var closeLine = d3.svg.line()
-			    		//.x(function(d) { return x(d.Year); })
-			    		.y(function(d) { return y(d.Killed); });
-					var lowLine = d3.svg.line()
-			    		.x(function(d) { return x(d.Day); });
-			    		//.y(function(d) { return y(d.Country); });*/
+					.y(function(d) { return y(d.Killed); });					
 
 			    	var area = d3.svg.area()
 			      		.x(function(d) { return x(d.Year); })
 			      		.y0(function(d) { return y(d.Killed); })
-			      	//	.y1(function(d) { return y(d.Country); })
 
 			    	var svg = d3.select("#graphDiv")
 			    		.append("svg")
@@ -92,15 +85,13 @@
 			        	.attr("transform", 
 			        	"translate(" + margin.left + "," + margin.top + ")");
 
-
 					function draw(data) {
 					  // For each row in the data, parse the date
 					  // and use + to make sure data is numerical
 					  data.forEach(function(d) {
 					    d.Year = d.Year;
 					    d.Killed += d.Killed;
-					   // d.Close = +d.Close;
-					   // d.Country = d.Country;
+
 					  });
 					  // Scale the range of the data
 					  x.domain(d3.extent(data, function(d) { return d.Year; }));
@@ -108,18 +99,13 @@
 					      return Math.min(d.Killed) }),
 					      d3.max(data, function(d) {
 					      return Math.max(d.Killed) })]);
-					  // Add the area path
-					/*  svg.append("path")
-					    .datum(data)
-					    .attr("class", "area")
-					    .attr("d", area)*/
+
 					  // Add the highLine as a green line
 					  var path = svg.append("path")
 					    .style("stroke", "green")
 					    .style("fill", "none")
 					    .attr("class", "line")
 					    .attr("d", killLine(data));
-
 					
 					  svg.append("g")
 					    .attr("class", "x axis")
@@ -144,7 +130,7 @@
 					    .style("fill", "red")
 					    .text("Year");
 
-
+					 //Circle on bottom grap
 					 var circle = svg.append("circle")
 					  .attr("r", 5)
 					  .style("fill", "red")
