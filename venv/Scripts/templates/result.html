@@ -12,6 +12,7 @@
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
+			padding: 1%;
 		}
 		#map {
   			width: 700px;
@@ -28,128 +29,188 @@
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
 <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
 	<body id = "body">
-		<div id="columnContainer">
-			<div id="rowContainer">
+		<div id = "rowContainer" >
+			<div id="columnContainer">
 				<div id ="map">
-   					<script type="text/javascript">
-				  		// The first parameter are the coordinates of the center of the map
-				  		// The second parameter is the zoom level
-				 		var map = L.map('map').setView([40.712, -74.006], 11);
-				  
-				    	var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-				    		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'});
-				 
-				  		map.addLayer(layer);
-					</script>
-				</div>
-			</div>
-   	<div id="rowContainer">
-   		<div id="graphDiv">
-			<script src="http://d3js.org/d3.v3.min.js"></script>
-   				<script>  		
-			 		//Graph: Killed over years
-			 		var graphData = {{ data.chart_data | safe}}	 
-			 		//Graph: List over most dangerous groups
-			 		var graphData_group = {{ data_group.chart_data_group | safe}}	 	 
-			 	   	
-			 	   	console.log(graphData_group);
+	   				<script type="text/javascript">
+					  	// The first parameter are the coordinates of the center of the map
 
-			 	   	//Graph: Killed over years
-			 	   	var margin = {top: 30, right: 50, bottom: 30, left: 50};
-					var svgWidth = 600;
-					var svgHeight = 270;
-					var graphWidth = svgWidth - margin.left - margin.right;
-					var graphHeight = svgHeight - margin.top - margin.bottom;
-
-					var parseDate = d3.time.format("%Y-%m-%d").parse;
-
-					var x = d3.time.scale().range([0, graphWidth]);
-					var y = d3.scale.linear().range([graphHeight, 0]);
-
-					var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
-					var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
-
-					var killLine = d3.svg.line()
-					.x(function(d) { return x(d.Year); })
-					.y(function(d) { return y(d.Killed); });					
-
-			    	var area = d3.svg.area()
-			      		.x(function(d) { return x(d.Year); })
-			      		.y0(function(d) { return y(d.Killed); })
-
-			    	var svg = d3.select("#graphDiv")
-			    		.append("svg")
-			        	.attr("width", svgWidth)
-			        	.attr("height", svgHeight)
-			    		.append("g")
-			        	.attr("transform", 
-			        	"translate(" + margin.left + "," + margin.top + ")");
-
-					function draw(data) {
-					  // For each row in the data, parse the date
-					  // and use + to make sure data is numerical
-					  data.forEach(function(d) {
-					    d.Year = d.Year;
-					    d.Killed += d.Killed;
-
-					  });
-					  // Scale the range of the data
-					  x.domain(d3.extent(data, function(d) { return d.Year; }));
-					  y.domain([d3.min(data, function(d) {
-					      return Math.min(d.Killed) }),
-					      d3.max(data, function(d) {
-					      return Math.max(d.Killed) })]);
-
-					  // Add the highLine as a green line
-					  var path = svg.append("path")
-					    .style("stroke", "green")
-					    .style("fill", "none")
-					    .attr("class", "line")
-					    .attr("d", killLine(data));
-					
-					  svg.append("g")
-					    .attr("class", "x axis")
-					    .attr("transform", "translate(0," + graphHeight + ")")
-					      .call(xAxis);
-					  // Add the Y Axis
-					  svg.append("g")
-					    .attr("class", "y axis")
-					    .call(yAxis);
-					  // Add the text for the "High" line
-					  svg.append("text")
-					    .attr("transform", "translate("+(graphWidth+3)+","+y(graphData[0].Killed)+")")
-					    .attr("dy", ".35em")
-					    .attr("text-anchor", "start")
-					    .style("fill", "green")
-					    .text("Killed");
-					  // Add the text for the "Low" line
-					  svg.append("text")
-					    .attr("transform", "translate("+(graphWidth+3)+","+y(graphData[0].Year)+")")
-					    .attr("dy", ".35em")
-					    .attr("text-anchor", "start")
-					    .style("fill", "red")
-					    .text("Year");
-
-					 //Circle on bottom grap
-					 var circle = svg.append("circle")
-					  .attr("r", 5)
-					  .style("fill", "red")
-					  .attr("cx", function(d) { return x(graphData[0].Year); })
-					  .attr("cy", function(d) { return y(graphData[0].Killed); });
+					  	// The second parameter is the zoom level
+					 	var map = L.map('map').setView([40.712, -74.006], 11);
 					  
-					path.on("click", function() {
-						circle.attr("cx", d3.mouse(this)[0])
-					    .attr("cy", d3.mouse(this)[1]);
-						});
-
-					};
-
-					draw(graphData);
-
+					    var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+					    	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'});
+					 
+					  		map.addLayer(layer);
 					</script>
 				</div>
+	   		<div id="graphDiv">
+				<script src="http://d3js.org/d3.v3.min.js"></script>
+
+	   				<script>  		
+				 		//Graph: Killed over years
+				 		var graphData = {{ data.chart_data | safe}}	 
+				 		//Graph: List over most dangerous groups
+				 		var graphData_group = {{ data_group.chart_data_group | safe}}	 	 
+				 	   	
+				 	   	console.log(graphData_group);
+
+				 	   	//Graph: Killed over years
+				 	   	var margin = {top: 30, right: 50, bottom: 30, left: 50};
+						var svgWidth = 600;
+						var svgHeight = 270;
+						var graphWidth = svgWidth - margin.left - margin.right;
+						var graphHeight = svgHeight - margin.top - margin.bottom;
+
+						var parseDate = d3.time.format("%Y-%m-%d").parse;
+
+						var x = d3.time.scale().range([0, graphWidth]);
+						var y = d3.scale.linear().range([graphHeight, 0]);
+
+						var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
+						var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
+
+						var killLine = d3.svg.line()
+						.x(function(d) { return x(d.Year); })
+						.y(function(d) { return y(d.Killed); });					
+
+				    	var area = d3.svg.area()
+				      		.x(function(d) { return x(d.Year); })
+				      		.y0(function(d) { return y(d.Killed); })
+
+				    	var svg = d3.select("#graphDiv")
+				    		.append("svg")
+				        	.attr("width", svgWidth)
+				        	.attr("height", svgHeight)
+				    		.append("g")
+				        	.attr("transform", 
+				        	"translate(" + margin.left + "," + margin.top + ")");
+
+						function drawGraph(data) {
+						  // For each row in the data, parse the date
+						  // and use + to make sure data is numerical
+						  data.forEach(function(d) {
+						    d.Year = d.Year;
+						    d.Killed += d.Killed;
+
+						  });
+						  // Scale the range of the data
+						  x.domain(d3.extent(data, function(d) { return d.Year; }));
+						  y.domain([d3.min(data, function(d) {
+						      return Math.min(d.Killed) }),
+						      d3.max(data, function(d) {
+						      return Math.max(d.Killed) })]);
+
+						  // Add the highLine as a green line
+						  var path = svg.append("path")
+						    .style("stroke", "green")
+						    .style("fill", "none")
+						    .attr("class", "line")
+						    .attr("d", killLine(data));
+						
+						  svg.append("g")
+						    .attr("class", "x axis")
+						    .attr("transform", "translate(0," + graphHeight + ")")
+						      .call(xAxis);
+						  // Add the Y Axis
+						  svg.append("g")
+						    .attr("class", "y axis")
+						    .call(yAxis);
+						  // Add the text for the "High" line
+						  svg.append("text")
+						    .attr("transform", "translate("+(graphWidth+3)+","+y(graphData[0].Killed)+")")
+						    .attr("dy", ".35em")
+						    .attr("text-anchor", "start")
+						    .style("fill", "green")
+						    .text("Killed");
+						  // Add the text for the "Low" line
+						  svg.append("text")
+						    .attr("transform", "translate("+(graphWidth+3)+","+y(graphData[0].Year)+")")
+						    .attr("dy", ".35em")
+						    .attr("text-anchor", "start")
+						    .style("fill", "red")
+						    .text("Year");
+
+						 //Circle on bottom grap
+						 var circle = svg.append("circle")
+						  .attr("r", 5)
+						  .style("fill", "red")
+						  .attr("cx", function(d) { return x(graphData[0].Year); })
+						  .attr("cy", function(d) { return y(graphData[0].Killed); });
+						  
+						path.on("click", function() {
+							circle.attr("cx", d3.mouse(this)[0])
+						    .attr("cy", d3.mouse(this)[1]);
+							});
+
+						};
+
+						
+
+						drawGraph(graphData);
+						
+
+						</script>
+				</div>
 			</div>
-		</div>
+				<div id="columnContainer">
+					<div id = "Tabulate">
+						<script>
+							function drawTabulate(data, columns){
+
+									data.forEach(function(d) {
+								    	d.Killed = d.Killed;
+								  	});
+
+									var table = d3.select("#Tabulate").append("table")
+									.attr("width", svgWidth)
+						        	.attr("height", svgHeight);
+
+									thead = table.append("thead");
+
+									tbody = table.append("tbody");
+				
+
+									//Append header row
+									thead.append("tr")
+										.selectAll("th")
+										.data(columns)
+										.enter()
+										.append("th")
+											.text(function(column){return column;});
+
+										console.log(data);
+										console.log(columns);    
+									// create a row for each object in the data
+								    var rows = tbody.selectAll("tr")
+								        .data(data)
+								        .enter()
+								        .append("tr");
+
+								    // create a cell in each row for each column
+								    var cells = rows.selectAll("td")
+								        .data(function(row) {
+								            return columns.map(function(column) {
+								                return {column: column, value: row[column]};
+								            });
+								        })
+								        .enter()
+								        .append("td")
+								        .text(function(d) { return d.value; });
+
+								          
+								    
+								    return table;
+
+
+								};
+
+								drawTabulate(graphData_group, ["Killed", "Group"]);
+
+						</script>
+					</div>
+				</div>
+			</div>
 		<img src="/plot.png" alt="my plot">
 	</body>
 </html>
