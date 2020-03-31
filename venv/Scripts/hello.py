@@ -54,7 +54,7 @@ app = Flask(__name__)
 def result():
 	chart_data = terror.to_dict(orient='records')
 	chart_data = json.dumps(chart_data, indent=2)
-	chart_data_group = terror_Group.to_dict()
+	chart_data_group = terror_Group.to_dict(orient='records')
 	chart_data_group = json.dumps(chart_data_group, indent=2)
 	data_group = {'chart_data_group' : chart_data_group}
 	data = {'chart_data': chart_data}
