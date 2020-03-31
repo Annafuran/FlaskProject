@@ -18,7 +18,7 @@ from flask import Response
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-#Hämtar och byter namn på datan, för enklare hantering. 
+#Hämtar och byter namn på datan, för enklare hantering.
 terror = pd.read_csv('globalterrorismdb_0718dist.csv', low_memory=False, error_bad_lines=False, encoding='ISO-8859-1')
 terror.rename(columns={'iyear':'Year','imonth':'Month',
 	'iday':'Day','country_txt':'Country','region_txt':'Region',
@@ -73,7 +73,7 @@ def plot_png():
 		output = io.BytesIO()
 		FigureCanvas(fig).print_png(output)
 		return Response(output.getvalue(), mimetype='image/png')
-		
+
 
 def create_figure():
 	fig = Figure()
