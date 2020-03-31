@@ -40,11 +40,20 @@
 
 						var graphData_location = {{data_location.chart_data_location | safe}}
 
-					    var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+   					console.log(graphData_location);
+						console.log(graphData_location[12].Long);
+						var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
 					    	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'});
-					 // TODO:  create a variable that runt thourgh the locations and places a marker
 
-					 var addMarker
+						// TODO:  create a variable that runt thourgh the locations and places a marker
+						for( var i=0; i < graphData_location.length; ++i)
+						{
+						//	var addMarker = L.marker( [graphData_location[i].Lat, graphData_location[i].Long] ).addTo(map);
+						if(graphData_location[i].Lat && graphData_location[i].Long)
+							var addMarker = L.marker( [graphData_location[i].Lat, graphData_location[i].Long] ).addTo(map);
+
+						}
+
 					  		map.addLayer(layer);
 					</script>
 				</div>
@@ -57,7 +66,7 @@
 				 		//Graph: List over most dangerous groups
 				 		var graphData_group = {{ data_group.chart_data_group | safe}}
 
-				 	   	console.log(graphData_group);
+
 
 				 	   	//Graph: Killed over years
 				 	   	var margin = {top: 30, right: 50, bottom: 30, left: 50};

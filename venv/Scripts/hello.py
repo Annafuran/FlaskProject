@@ -22,17 +22,21 @@ from matplotlib.figure import Figure
 terror = pd.read_csv('globalterrorismdb_0718dist.csv', low_memory=False, error_bad_lines=False, encoding='ISO-8859-1')
 terror.rename(columns={'iyear':'Year','imonth':'Month',
 	'iday':'Day','country_txt':'Country','region_txt':'Region',
+	'latitude' : 'Lat', 'longitude' : 'Long',
 	'attacktype1_txt':'AttackType','target1':'Target',
 	'nkill':'Killed','nwound':'Wounded','summary':'Summary',
 	'gname':'Group','targtype1_txt':'Target_type',
 	'weaptype1_txt':'Weapon_type','motive':'Motive'},inplace=True)
 #terror_Group = terror['Group'].astype(str)
 terror_Group = terror[['Killed', 'Group']]
+terror_Location = terror[['Killed', 'Lat', 'Long']]
 
 terror_Group =terror_Group[terror_Group.Group != 'Unknown']
 terror_Group = terror_Group.groupby('Group').count().reset_index()
 terror_Group['Killed'] = terror_Group['Killed'].astype(float)
-terror_Group = terror_Group.sort_values(by='Killed',ascending=False, na_position='last', ignore_index=True)
+#terror_Group = terror_Group.sort_values(by='Killed',ascending=False, na_position='last', ignore_index=True)
+terror_Location = terror_Location.groupby('Killed')['Lat', 'Long'].mean().reset_index()
+#måste får groupby att baseras på två variabler
 
 terror['Year'] = terror['Year'].astype(float)
 terror['Killed'] = terror['Killed'].astype(float)
@@ -57,8 +61,12 @@ def result():
 	chart_data_group = terror_Group.to_dict(orient='records')
 	chart_data_group = json.dumps(chart_data_group, indent=2)
 	data_group = {'chart_data_group' : chart_data_group}
+
+	chart_data_location = terror_Location.to_dict(orient = 'records')
+	chart_data_location = json.dumps(chart_data_location, indent=2)
+	data_location = {'chart_data_location' : chart_data_location}
 	data = {'chart_data': chart_data}
-	return render_template('result.html', data=data, data_group=data_group)
+	return render_template('result.html', data=data, data_group=data_group, data_location=data_location)
 
 
 @app.route('/bar')
