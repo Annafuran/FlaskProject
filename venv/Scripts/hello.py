@@ -19,7 +19,8 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 
 #Hämtar och byter namn på datan, för enklare hantering.
-terror = pd.read_csv('globalterrorismdb_0718dist.csv', low_memory=False, error_bad_lines=False, encoding='ISO-8859-1')
+terror = pd.read_csv('globalterrorismdb_0718dist.csv', low_memory=False, error_bad_lines=False, encoding='ISO-8859-1', nrows=100000)
+
 terror.rename(columns={'iyear':'Year','imonth':'Month',
 	'iday':'Day','country_txt':'Country','region_txt':'Region',
 	'latitude' : 'Lat', 'longitude' : 'Long',
@@ -27,15 +28,20 @@ terror.rename(columns={'iyear':'Year','imonth':'Month',
 	'nkill':'Killed','nwound':'Wounded','summary':'Summary',
 	'gname':'Group','targtype1_txt':'Target_type',
 	'weaptype1_txt':'Weapon_type','motive':'Motive'},inplace=True)
+
+
 #terror_Group = terror['Group'].astype(str)
 terror_Group = terror[['Killed', 'Group']]
-terror_Location = terror[['Killed', 'Lat', 'Long']]
+terror_Location = terror[['Killed', 'Group', 'Lat', 'Long']]
 
 terror_Group =terror_Group[terror_Group.Group != 'Unknown']
 terror_Group = terror_Group.groupby('Group').count().reset_index()
 terror_Group['Killed'] = terror_Group['Killed'].astype(float)
-#terror_Group = terror_Group.sort_values(by='Killed',ascending=False, na_position='last', ignore_index=True)
-terror_Location = terror_Location.groupby('Killed')['Lat', 'Long'].mean().reset_index()
+terror_Group = terror_Group.sort_values(by='Killed',ascending=False, na_position='last', ignore_index=True)
+#terror_Location = terror_Location.groupby('Killed')['Lat', 'Long'].mean().reset_index()
+terror_Location = terror_Location.groupby('Killed').agg({'Lat':'mean', 'Long':'mean', 'Group':'first'})
+
+
 #måste får groupby att baseras på två variabler
 
 terror['Year'] = terror['Year'].astype(float)
