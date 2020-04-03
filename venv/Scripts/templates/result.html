@@ -17,10 +17,12 @@
 		#map {
   			width: 700px;
     		height: 600px;
+				margin-left: 10px;
 		}
 		#body
 		{
-			background-color: white;
+			background-color: black;
+			color: #b5b5b5;
 		}
 
 	</style>
@@ -38,33 +40,44 @@
 					  	// The second parameter is the zoom level
 						var graphData_location = {{data_location.chart_data_location | safe}}
 						var map = null;
+						var popup = L.popup();
 
 						function drawMap(data, val){
-						
-						if (map !== undefined && map !== null) {
-							map.remove(); // should remove the map from UI and clean the inner children of DOM element
-						 	console.log(map); // nothing should actually happen to the value of mymap
-						}	
 
-						map = L.map('map').setView([40.712, -74.006], 11);
-	   					console.log(data);
-						var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-					    	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'});
+							if (map !== undefined && map !== null) {
+								map.remove(); // should remove the map from UI and clean the inner children of DOM element
+							 	//console.log(map); // nothing should actually happen to the value of mymap
+							}
 
-						// TODO:  create a variable that runt thourgh the locations and places a marker
-						for( var i=0; i < data.length; ++i)
-						{
-						//	var addMarker = L.marker( [graphData_location[i].Lat, graphData_location[i].Long] ).addTo(map);
-						if(val == 0 || val == data[i].Group){
+							map = L.map('map').setView([40.712, -74.006], 11);
+		   				//	console.log(data);
+							var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+						    	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'});
 
-							if(data[i].Lat && data[i].Long)
-							var addMarker = L.marker( [data[i].Lat, data[i].Long] ).addTo(map);
-						}
-						}
-					  		map.addLayer(layer);
+							for( var i=0; i < data.length; ++i)
+							{
+							//	var addMarker = L.marker( [graphData_location[i].Lat, graphData_location[i].Long] ).addTo(map);
+							if(val == 0 || val == data[i].Group){
+								if(data[i].Lat && data[i].Long){
+									var addMarker = L.marker( [data[i].Lat, data[i].Long] ).addTo(map).on('click', onMapClick(graphData_location));
+							}
+							}
+							}
+						  		map.addLayer(layer);
 					  	};
 
-					  	drawMap(graphData_location, 0);
+							//Skapa pop-up
+							function onMapClick(data) {
+								//TODO: create a message to show when you click on a marker
+							/*	for(var i=0; i<data.length; ++i){
+									popup
+										.setLatLng([data[i].Lat, data[i].Long])
+										.setContent(data[i].killed)
+										.openOn(map);
+								}*/
+							};
+
+							drawMap(graphData_location, 0);
 					</script>
 				</div>
 	   		<div id="graphDiv">
@@ -75,11 +88,13 @@
 				 		var graphData = {{ data.chart_data | safe}}
 				 		//Graph: List over most dangerous groups
 				 		var graphData_group = {{ data_group.chart_data_group | safe}}
+						//Graph: Connect map to some window, dont need this here i think since it declared in map
+						var graphData_location = {{data_location.chart_data_location | safe}}
 
+						console.log(graphData_location);
 
-
-				 	   	//Graph: Killed over years
-				 	   	var margin = {top: 30, right: 50, bottom: 30, left: 50};
+				 	  //Graph: Killed over years
+				 	 	var margin = {top: 30, right: 50, bottom: 30, left: 50};
 						var svgWidth = 600;
 						var svgHeight = 270;
 						var graphWidth = svgWidth - margin.left - margin.right;
@@ -132,11 +147,13 @@
 						    .attr("d", killLine(data));
 
 						  svg.append("g")
+								.style("fill","#b5b5b5")
 						    .attr("class", "x axis")
 						    .attr("transform", "translate(0," + graphHeight + ")")
 						      .call(xAxis);
 						  // Add the Y Axis
 						  svg.append("g")
+							.style("fill","#b5b5b5")
 						    .attr("class", "y axis")
 						    .call(yAxis);
 						  // Add the text for the "High" line
@@ -202,7 +219,7 @@
 										.enter()
 										.append("th")
 										.text(function(column){return column;});
-		
+
 									// create a row for each object in the data
 								    var rows = tbody.selectAll("tr")
 								        .data(data)
