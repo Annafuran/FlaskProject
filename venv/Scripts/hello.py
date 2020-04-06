@@ -39,7 +39,7 @@ terror_Group = terror_Group.groupby('Group').count().reset_index()
 terror_Group['Killed'] = terror_Group['Killed'].astype(float)
 terror_Group = terror_Group.sort_values(by='Killed',ascending=False, na_position='last', ignore_index=True)
 #terror_Location = terror_Location.groupby('Killed')['Lat', 'Long'].mean().reset_index()
-terror_Location = terror_Location.groupby('Killed').agg({'Lat':'mean', 'Long':'mean', 'Group':'first'})
+terror_Location = terror_Location.groupby('Killed').agg({'Lat':'mean', 'Long':'mean', 'Group':'first', 'Killed': 'first'})
 
 
 #måste får groupby att baseras på två variabler
