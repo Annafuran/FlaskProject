@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template
 import numpy as np
 import json
@@ -33,14 +32,18 @@ terror.rename(columns={'iyear':'Year','imonth':'Month',
 #terror_Group = terror['Group'].astype(str)
 terror_Group = terror[['Killed', 'Group']]
 terror_Location = terror[['Killed', 'Group', 'Lat', 'Long']]
+terror_Weapon = terror[['Killed', 'Weapon_type']]
 
 terror_Group =terror_Group[terror_Group.Group != 'Unknown']
 terror_Group = terror_Group.groupby('Group').count().reset_index()
 terror_Group['Killed'] = terror_Group['Killed'].astype(float)
-terror_Group = terror_Group.sort_values(by='Killed',ascending=False, na_position='last', ignore_index=True)
+#terror_Group = terror_Group.sort_values(by='Killed',ascending=False, na_position='last', ignore_index=True)
 #terror_Location = terror_Location.groupby('Killed')['Lat', 'Long'].mean().reset_index()
-terror_Location = terror_Location.groupby('Killed').agg({'Lat':'mean', 'Long':'mean', 'Group':'first'})
+terror_Location = terror_Location.groupby('Killed').agg({'Lat':'mean', 'Long':'mean', 'Group':'first', 'Killed': 'first'})
 
+terror_Weapon = terror_Weapon.groupby('Weapon_type').count().reset_index()
+# # TODO:  lägg in en sort_values här!!
+terror_Weapon = terror_Weapon.sort_values(by='Killed', ascending = False)
 
 #måste får groupby att baseras på två variabler
 
@@ -64,15 +67,21 @@ app = Flask(__name__)
 def result():
 	chart_data = terror.to_dict(orient='records')
 	chart_data = json.dumps(chart_data, indent=2)
+	data = {'chart_data': chart_data}
+
 	chart_data_group = terror_Group.to_dict(orient='records')
 	chart_data_group = json.dumps(chart_data_group, indent=2)
 	data_group = {'chart_data_group' : chart_data_group}
 
+	chart_data_weapon = terror_Weapon.to_dict(orient = 'records')
+	chart_data_weapon = json.dumps(chart_data_weapon, indent = 2)
+	data_weapon = {'chart_data_weapon' : chart_data_weapon}
+
 	chart_data_location = terror_Location.to_dict(orient = 'records')
 	chart_data_location = json.dumps(chart_data_location, indent=2)
 	data_location = {'chart_data_location' : chart_data_location}
-	data = {'chart_data': chart_data}
-	return render_template('result.html', data=data, data_group=data_group, data_location=data_location)
+
+	return render_template('result.html', data=data, data_group=data_group, data_location=data_location, data_weapon=data_weapon)
 
 
 @app.route('/bar')
