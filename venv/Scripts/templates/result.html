@@ -119,8 +119,10 @@
 										}
 									}
 							}
+
+
 						  		map.addLayer(layer);
-					  	};
+
 
 							drawMap(graphData_location, 0);
 					</script>
@@ -240,6 +242,19 @@
 						          );
 							};
 
+							// If user double click, reinitialize the chart
+						    svg.on("dblclick",function(){
+						      x.domain(d3.extent(data, function(d) { return d.Year; }))
+						      xAxis.transition().call(d3.axisBottom(x))
+						      path
+						        .select('.line')
+						        .transition()
+						        .attr("d", d3.line()
+						          .x(function(d) { return x(d.Year) })
+						          .y(function(d) { return y(d.Killed) })
+						      )
+						    });
+						};
 
 							// If user double click, reinitialize the chart
 						    svg.on("dblclick",function(){
