@@ -31,31 +31,34 @@ terror.rename(columns={'iyear':'Year','imonth':'Month',
 
 #terror_Group = terror['Group'].astype(str)
 terror_Group = terror[['Killed', 'Group']]
-terror_Location = terror[['Killed', 'Group', 'Lat', 'Long']]
+terror_Location = terror[['Killed', 'Group', 'Lat', 'Long', 'Year']]
 terror_Weapon = terror[['Killed', 'Weapon_type']]
 
 terror_Group =terror_Group[terror_Group.Group != 'Unknown']
-terror_Group = terror_Group.groupby('Group').count().reset_index()
-terror_Group['Killed'] = terror_Group['Killed'].astype(float)
+terror_Group = terror_Group.groupby('Killed').agg({'Group':'first', 'Killed': 'first'})
+terror_Group = terror_Group.drop_duplicates('Group', keep='last')
+terror_Group = terror_Group.sort_index(ascending=False)
+
+#terror_Group['Killed'] = terror_Group['Killed'].astype(float)
 #terror_Group = terror_Group.sort_values(by='Killed',ascending=False, na_position='last', ignore_index=True)
 #terror_Location = terror_Location.groupby('Killed')['Lat', 'Long'].mean().reset_index()
-terror_Location = terror_Location.groupby('Killed').agg({'Lat':'mean', 'Long':'mean', 'Group':'first', 'Killed': 'first'})
+terror_Location = terror_Location.groupby('Killed').agg({'Lat':'mean', 'Long':'mean', 'Group':'first', 'Killed': 'first', 'Year': 'first'})
 
 terror_Weapon = terror_Weapon.groupby('Weapon_type').count().reset_index()
 # # TODO:  lägg in en sort_values här!!
 terror_Weapon = terror_Weapon.sort_values(by='Killed', ascending = False)
 
 #måste får groupby att baseras på två variabler
-
 terror['Year'] = terror['Year'].astype(float)
 terror['Killed'] = terror['Killed'].astype(float)
 terror = terror.drop(['Month', 'Day', 'approxdate'], axis=1)
 terror = terror.groupby('Year').count().reset_index()
-#terror_Group = terror.groupby('Group').sum().reset_index()
+
 
 #terror = terror.pivot_table(terror, index=['Year', ])
 terror = terror.head(48)
 terror_Group = terror_Group.head(10)
+
 #terror.drop(['Month','Day', 'Country','Region','AttackType','Target','Killed',
 #	'Wounded','Summary','Group','Target_type','Weapon_type','Motive'],axis=1)
 #terror.drop(['Summary', 'Region', 'Motive', 'Weapon_type', 'Group', 'Target_type', 'Country','AttackType', 'Target', 'Killed', 'Wounded'], axis=1)
