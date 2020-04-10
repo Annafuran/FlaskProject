@@ -7,6 +7,7 @@
 			display: flex;
 			justify-content: center;
 			flex-direction: row;
+
 		}
 		#topHeader{
 			width: 100%;
@@ -23,47 +24,63 @@
 			justify-content: center;
 			padding: 1%;
 			margin-bottom: auto;
+
 		}
 		#map {
   			width: 900px;
     		height: 500px;
+    		box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 		}
 		#body
 		{
-			background-color: rgb(238, 238, 238);
+			background-color: rgba(212, 218, 220, 0.5);
 		}
 		.header {
 			 text-align: center;
 			 background-color: white;
-			 color: rgb(166, 166, 168);
-			 font-size: 12px;
+			 color: rgb(146, 160, 170); 
+			 font-size: 10px;
 			 font-family: 'Roboto', sans-serif;
+
 		}
 		#topHeader{
 			 text-align: center;
 			 height: 5%;
-			 color: rgb(183, 186, 191);
+			 color: rgba(146, 160, 170, 0.8);
 			 background-color: white;
 			 font-size: 16px;
 			 font-family: 'Roboto', sans-serif;
+			 box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
 		}
 		#Tabulate{
 			 background-color: white;
 			 color: #2E1114;
 			 font-size: 14px;
 			 font-family: 'Roboto', sans-serif;
+			 box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			 padding: 1%;
 		}
 		#graphDiv{
 			font-family: 'Roboto', sans-serif;
+			text-align: center;
 			background-color: white;
-			color: rgb(166, 166, 168);
+			color: rgb(146, 160, 170); 
+			font-size: 16px;
 			justify-content: center;
+			box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 		}
 		#weaponTabulate{
 			font-family: 'Roboto', sans-serif;
 			background-color: white;
 			font-size: 14px;
+			padding: 1%;
 			color: rgb(166, 166, 168);
+			box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+		}
+		.axisGrey{
+		  stroke: rgb(166, 166, 168);
 		}
 	</style>
 </head>
@@ -79,24 +96,27 @@
 			<div id="columnContainer">
 				<div id = "weaponTabulate">
 					<div class="header">
-  						<h1>Which terror organization executed the attack? </h1>
-  						<p>Click on the group to filter the map view.</p>
+  						<h1>Weapon used in the attack</h1>
+  						<p style = "color: rgba(253, 137, 112, 0.8); font-size: 14px">Click on the group to filter the map view.</p>
 					</div>
 					<script src="https://d3js.org/d3.v4.js"></script>
 		   				<script>
-							 //Graph: Killed over years
-							 var graphData = {{ data.chart_data | safe}}
-							 //Graph: List over most dangerous groups
-							 var graphData_group = {{ data_group.chart_data_group | safe}}
+		   					//TODOLIST
+		   					//1. ge användaren möjlighet att reseta kartan. 
+		   					//2. Göra weapongrafen mer interaktiv.
+		   					//3. Lägga till övergripande data under headern. 
+		   					//4. Lägga till ngn mer graf (?)
+
+							//Graph: Killed over years
+							var graphData = {{ data.chart_data | safe}}
+							//Graph: List over most dangerous groups
+							var graphData_group = {{ data_group.chart_data_group | safe}}
 							//Graph: Connect map to some window, dont need this here i think since it declared in map
 							var graphData_location = {{data_location.chart_data_location | safe}}
 							// Graph: list of most used weapons
 							var graphData_weapon = {{data_weapon.chart_data_weapon | safe}}
-
-
-							
-							//Graph: Killed over years
-							var margin = {top: 10, right: 30, bottom: 30, left: 60};
+	
+							var margin = {top: 10, right: 30, bottom: 50, left: 120};
 							var graphWidth = 460 - margin.left - margin.right;
 			    			var graphHeight = 400 - margin.top - margin.bottom;
 
@@ -109,6 +129,11 @@
 					       		"translate(" + margin.left + "," + margin.top + ")");
 
 					       	function drawWeaponGraph(data){
+
+					       		data.forEach(function(d) {
+								    	d.Killed = d.Killed;
+								    	d.Weapon_type = d.Weapon_type;
+								});
 					       		
 					       		//Adding x-axis
 								var x = d3.scaleLinear()
@@ -119,9 +144,9 @@
 							 		.attr("transform", "translate(0," + graphHeight + ")")
 							    	.call(d3.axisBottom(x))
 							    	.selectAll("text")
-							      		.attr("transform", "translate(-10,0)rotate(-45)")
-							      		.style("text-anchor", "end")
-							      		.attr("font-family", function(d,i) {return i<5 ? "Roboto" : "sans-serif"; })
+										.style("fill", "rgb(146, 160, 170")
+										.style("font-family", "Roboto, sans-serif")
+										.style("font-size", "10px");
 						
 
 							    //Adding y-axis
@@ -130,7 +155,11 @@
 							    	.domain(data.map(function(d) { return d.Weapon_type; }));
 
 							    svg.append("g")
-							    	.call(d3.axisLeft(y));
+							    	.call(d3.axisLeft(y))
+							    	.selectAll("text")
+										.style("fill", "rgb(146, 160, 170")
+										.style("font-family", "Roboto, sans-serif")
+										.style("font-size", "10px");
 
 							    //Adding bars
 							    svg.selectAll("myRect")
@@ -141,36 +170,28 @@
 							    	.attr("y", function(d) {return y(d.Weapon_type);})
 							    	.attr("width", function(d) {return x(d.Killed);})
 							    	.attr("height", y.bandwidth()-5)
-							    	.attr("fill", "red")
+							    	.attr("fill", "rgb(206, 63, 104)")
 							    	.on("mouseover", function() {
 						            d3.select(this)
-						            	.attr("fill", "blue");
+						            	.attr("fill", "rgb(206, 63, 104)");
+						            	//DO SOMETHING
 						        	})
 						        	.on("mouseout", function() {
 							            d3.select(this)
-							            	.attr("fill", "red");
+							            	.attr("fill", "rgb(206, 63, 104)");
 							        });
- 
-
-							
-
 					       	}
 
 					       	drawWeaponGraph(graphData_weapon);
-
-
 	    				</script>
 	    		</div>
 			</div>
 			<div id="columnContainer">
 				<div id ="map">
 	   				<script type="text/javascript">
-					  	// The first parameter are the coordinates of the center of the map
 
-					  	// The second parameter is the zoom level
 						var graphData_location = {{data_location.chart_data_location | safe}}
 						var map = null;
-
 
 						function drawMap(data, val){
 
@@ -179,17 +200,13 @@
 								    	d.Weapon_type = d.Weapon_type;
 								});
 
-
 							if (map !== undefined && map !== null) {
 								map.remove(); // should remove the map from UI and clean the inner children of DOM element
-							 	//console.log(map); // nothing should actually happen to the value of mymap
 							}
 
 							map = L.map('map').setView([41.90, 	12.46], 2);
-		   				//	console.log(data);
 							var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
 						    	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'});
-
 							var myMarker = null;
 
 							//Get the radius of the marker based on number of killed persons at attack.
@@ -201,14 +218,14 @@
 								        2;
 								}
 
-								function getColor(r) {
-									return r > 1000 ? "#581845" :
-												r > 400 ? "#900C37" :
-												r > 200 ? "#C70039" :
-												r > 100 ? "#FF5733" :
-												"#FFC300";
+							function getColor(r) {
+								return r > 1000 ? "#581845" : //R: 88 G: 24 B: 69
+											r > 400 ? "#900C37" :
+											r > 200 ? "#C70039" :
+											r > 100 ? "#FF5733" :
+											"#FFC300";
 
-								}
+							}
 							//Placing out the markers
 							for( var i=0; i < data.length; ++i)
 							{
@@ -234,7 +251,6 @@
 								}
 							}
 
-
 						  	map.addLayer(layer);
 
 						  	};
@@ -242,9 +258,14 @@
 							drawMap(graphData_location, 0);
 					</script>
 				</div>
-	   		<div id="graphDiv">
-					<p>Killed per year </p>
+
+	   		<div id="graphDiv"> 
+				<div class="header">
+  						<h1 style = "padding-top: 2%">Kills over time</h1>
+  						<p style = "color: rgba(253, 137, 112, 0.8); font-size: 14px">Use the brush to sort the data</p>
+				</div>
 				<script src="https://d3js.org/d3.v4.js"></script>
+				<script src="https://d3js.org/d3-selection-multi.v0.4.min.js"></script>
 	   				<script>
 				 		//Graph: Killed over years
 				 		var graphData = {{ data.chart_data | safe}}
@@ -254,10 +275,7 @@
 						var graphData_location = {{data_location.chart_data_location | safe}}
 						// Graph: list of most used weapons
 						var graphData_weapon = {{data_weapon.chart_data_weapon | safe}}
-
-
-						console.log(graphData_group);
-				 	  //Graph: Killed over years
+				 	 	
 				 	 	var margin = {top: 10, right: 30, bottom: 30, left: 60};
 						var graphWidth = 460 - margin.left - margin.right;
 						var graphWidth_map = 800 - margin.left - margin.right;
@@ -271,7 +289,7 @@
 					       	.attr("transform",
 					       		"translate(" + margin.left + "," + margin.top + ")");
 
-						//Draw our data.
+						//Drawing graph killed over years. 
 						function drawGraph(data, data_map) {
 
 							data.forEach(function(d) {
@@ -287,7 +305,11 @@
 							//xAxis
 							var xAxis = svg.append("g")
 							.attr("transform", "translate(0," + graphHeight + ")")
-							.call(d3.axisBottom(x));
+							.call(d3.axisBottom(x))
+							.selectAll("text")
+								.style("fill", "rgb(146, 160, 170") 
+								.style("font-family", "Roboto, sans-serif")
+								.style("font-size", "12px");
 
 							//Data on yAxis
 							var y = d3.scaleLinear()
@@ -296,12 +318,23 @@
 
 							//yAxis
 							var yAxis = svg.append("g")
-							.call(d3.axisLeft(y));
+							.call(d3.axisLeft(y))
+							.selectAll("text")
+								.style("fill", "rgb(146, 160, 170")
+								.style("font-family", "Roboto, sans-serif")
+								.style("font-size", "12px");
+
 
 							//our Line
 							var killLine = d3.line()
 								.x(function(d) { return x(d.Year); })
 								.y(function(d) { return y(d.Killed); });
+
+							//our area under the line
+							var area = d3.area()
+							    .x(function(d) { return x(d.Year); })
+							    .y0(graphHeight)
+							    .y1(function(d) { return y(d.Killed); });
 
 
 							  //Only this area will be drawn if we use the clip tool.
@@ -325,10 +358,17 @@
 							  //Add line
 							  path.append("path")
 							  	.datum(data)
-							    .style("stroke", "#FF5733")
+							    .style("stroke", "rgb(88, 24, 69)")
 							    .style("fill", "none")
 							    .attr("class", "line")
 							    .attr("d", killLine(data));
+
+							    //Add area
+							    path.append("path")
+							    .datum(data)
+							    .attr("class", "area")
+							    .style("fill", "rgba(88, 26, 69, 0.2)")
+							    .attr("d", area);
 
 							  //Add brush
 							  path.append("g").attr("class", "brush").call(brush);
@@ -339,26 +379,25 @@
 
 							  //Updates the chart if we use the cut tool.
 							  function updateChart(){
-
-							  	
+						  	
 							  	extent = d3.event.selection;
-							  	
 							  	
 							  	if(extent !=null){
 							  		minAxis = Math.round(x.invert(extent[0]));	
 							  		maxAxis = Math.round(x.invert(extent[1])); 
 
+							  		//Sorting out marked data
 							  		filteredNodes = data_map.filter(
 									function(d) {
 										return (d.Year >= minAxis && d.Year <=maxAxis);
 									});
 
-									/*for (var i = 0; i < filteredNodes.length; i++) {
-										console.log("Hej")
-										console.log(filteredNodes[i].Year);
+									for (var i = 0; i < filteredNodes.length; i++) {
+
+									    //Sending the marked data to the map
 									    drawMap(graphData_location, filteredNodes[i].Year);
-									    //Do something
-									}*/
+									}
+									//Resets the map
 									drawMap(filteredNodes, 0);
 									
 							  	}
@@ -366,31 +405,32 @@
 
 							  	// If no selection, back to initial coordinate. Otherwise, update X axis domain
 							    if(!extent){
-							    	if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
+							    	// This allows to wait a little bit
+							    	if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); 
 							        x.domain([4,8])
 							      	}else{
 						      		test = x.domain([ x.invert(extent[0]), x.invert(extent[1]) ]);
-							      				        	
-							        	path.select(".brush").call(brush.move, null); // This remove the grey brush area as soon as the selection has been done
+							      		// This remove the grey brush area as soon as the selection has been done		        	
+							        	path.select(".brush").call(brush.move, null); 
 							        	
 							      	}
 
-						      // Update axis and line position
+						      // Update axis, line position and area
 						      xAxis.transition().duration(1000).call(d3.axisBottom(x))
 						      path
 						          .select('.line')
 						          .transition()
 						          .duration(1000)
-						          .attr("d", d3.line()
-						            .x(function(d) { return x(d.Year); })
-						            .y(function(d) { return y(d.Killed); })
-						          );
-
-
+						          .attr("d", killLine);
+						      path
+						          .select('.area')
+						          .transition()
+						          .duration(1000)
+						          .attr("d", area);
 							};
 
 
-							// If user double click, reinitialize the chart
+							// If user double click, reinitialize the chart and map
 						    svg.on("dblclick",resetGraph);
 
 						    function resetGraph(){
@@ -400,17 +440,18 @@
 						      path
 						        .select('.line')
 						        .transition()
-						        .attr("d", d3.line()
-						          .x(function(d) { return x(d.Year) })
-						          .y(function(d) { return y(d.Killed) })
-						      	)
+						        .attr("d",killLine);
+						     
+						     path
+						          .select('.area')
+						          .transition()
+						          .attr("d", area);
 
 						     drawMap(graphData_location, 0);
 
 						    };
 						};
 					
-
 						drawGraph(graphData, graphData_location);
 
 						</script>
@@ -420,16 +461,18 @@
 					<div id = "Tabulate">
 						<div class="header">
   						<h1>Which terror organization executed the attack? </h1>
-  						<p>Click on the group to filter the map view.</p>
+  						<p style = "color: rgba(253, 137, 112, 0.8); font-size: 14px"> Click on the group to filter the map view.</p>
 					</div>
 						<script>
 							function drawTabulate(data, columns){
 
 									data.forEach(function(d) {
-								    	d.Killed = d.Killed;
-								    	d.Group = d.Group;
+										d.Group = d.Group;
+								    	d.Killed += d.Killed;
+								    	
 								  	});
 
+									//Creating the table
 									var table = d3.select("#Tabulate").append("table")
 									.attr("width", graphWidth)
 						        	.attr("height", graphHeight);
@@ -442,37 +485,49 @@
 										.selectAll("th")
 										.data(columns)
 										.enter()
-										.append("th");
-										//.text(function(column){return column;});
+										.append("th")
+										.text(function(column){return column;})
+										.style("font-family", "Roboto, sans-serif")
+										.style("font-size", "16px")
+										.style("color", "rgb(88, 24, 69)")
+										.style("text-align", "left");
+
 
 									// create a row for each object in the data
 								    var rows = tbody.selectAll("tr")
 								        .data(data)
 								        .enter()
-								        .append("tr");
+								        .append("tr")
+								        .style("color", "rgba(88, 24, 69, 0.8)")
+										.style("font-family", "Roboto, sans-serif")
+										.style("font-size", "14px")
+										.on("click", function(d){
+											drawMap(graphData_location, d.Group);
+										})
+										.on("mouseover", function(){
+										    d3.select(this).style("background-color", "rgba(88, 24, 69, 0.2)");
+										  })
+										.on("mouseout", function(){
+										    d3.select(this).style("background-color", "white");
+										});
+									   
+
 
 								    // create a cell in each row for each column
 								    var cells = rows.selectAll("td")
 								        .data(function(row) {
 								            return columns.map(function(column) {
-								                return {column: column, value: row[column]};
+								                return {value: row[column], column: column};
 								            });
 								        })
 								        .enter()
 								        .append("td")
 								        .text(function(d) { return d.value; })
-								        .on("click", function(d){
-
-											var group = d.value;
-											drawMap(graphData_location, d.value);
-										});
-
-
+								        
 								    return table;
 								};
 
-
-								drawTabulate(graphData_group, ["Killed", "Group"]);
+								drawTabulate(graphData_group, ["Group", "Killed"]);
 
 						</script>
 
