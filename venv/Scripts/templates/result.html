@@ -57,11 +57,13 @@
 		#topContainer{
 			background-color: white;
 			color: #2E1114;
-			font-size: 14px;
+			font-size: 18px;
 			font-family: 'Roboto', sans-serif;
 			box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-			padding: 1%;
+			padding: 0.5%;
 			margin-top: 16px;
+			text-align: center;
+			display: flex; flex-direction: row;
 
 		}
 
@@ -105,10 +107,15 @@
 	</div>
 	<body id = "body">
 		<div id="topContainer">
-			<p id="topDeaths"></p>
+			<p style = "color: white; padding: 1%; margin-left:4%; background-color: #581845; width : 20%"id="topDeaths"></p>
+			<p style = "color: white; padding: 1%; margin-left:1%; background-color: #FFA911; width : 20%"id="topDeaths">hej1</p>
+			<p style = "color: white; padding: 1%; margin-left:1%; background-color: #C70039; width : 20%"id="topDeaths">hej2</p>
+			<p style = "color: white; padding: 1%; margin-left:1%; background-color: #FF5733; width : 20%"id="topDeaths">hej3</p>
+
 			<script type="text/javascript">
-				var graphData = {{ data.chart_data | safe}}
-				document.getElementById("topDeaths").innerHTML = "TEST";
+				var graphData_country = {{ data_country.chart_data_country | safe}}
+				document.getElementById("topDeaths").innerHTML = "Most deaths in " + graphData_country[0].Country + " with " + graphData_country[0].Killed + " deaths";
+				console.log(graphData_country[1]);
 				// Skapa olika rutor med info
 			</script>
 
@@ -553,7 +560,6 @@
 										tbody.on("dblclick",resetOrganization);
 										//console.log("hej");
 								    function resetOrganization(){
-											console.log("hej2");
 								     	drawMap(graphData_location, 0);
 
 								    };
