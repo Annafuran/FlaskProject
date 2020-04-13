@@ -37,7 +37,7 @@ terror_Weapon = terror[['Killed', 'Weapon_type']]
 terror_Weapon =terror_Weapon[terror_Weapon.Weapon_type != 'Unknown']
 terror_Group =terror_Group[terror_Group.Group != 'Unknown']
 
-#Grupperar i killed, sen sorterar så "flest kills" hamnar högst upp. 
+#Grupperar i killed, sen sorterar så "flest kills" hamnar högst upp.
 terror_Group = terror_Group.groupby('Killed').agg({'Group':'first', 'Killed': 'first'})
 terror_Group = terror_Group.drop_duplicates('Group', keep='last')
 terror_Group = terror_Group.sort_index(ascending=False)
@@ -49,7 +49,7 @@ terror_Location = terror_Location.groupby('Killed').agg({'Lat':'mean', 'Long':'m
 terror_Weapon = terror_Weapon.groupby('Killed').agg({'Weapon_type':'first', 'Killed': 'first'})
 terror_Weapon = terror_Weapon.sort_index(ascending = False)
 
-#Gör om datatyper till floats. 
+#Gör om datatyper till floats.
 terror['Year'] = terror['Year'].astype(float)
 terror['Killed'] = terror['Killed'].astype(float)
 
@@ -57,7 +57,7 @@ terror['Killed'] = terror['Killed'].astype(float)
 terror = terror.drop(['Month', 'Day', 'approxdate'], axis=1)
 terror = terror.groupby('Year').count().reset_index()
 
-#Tar endast med de första i antal. Obs viktigt att ej göra det på terror_location. 
+#Tar endast med de första i antal. Obs viktigt att ej göra det på terror_location.
 terror = terror.head(48)
 terror_Group = terror_Group.head(10)
 
@@ -83,7 +83,6 @@ def result():
 
 	return render_template('result.html', data=data, data_group=data_group, data_location=data_location, data_weapon=data_weapon)
 
-
 @app.route('/bar')
 def bar():
 		bar_labels = labels
@@ -105,8 +104,5 @@ def create_figure():
 	ys = [random.randint(1, 50) for x in xs]
 	axis.plot(xs, ys)
 	return fig
-
-
-
 
 #m._repr_html_()
