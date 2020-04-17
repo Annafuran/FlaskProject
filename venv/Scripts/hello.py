@@ -32,6 +32,8 @@ terror.rename(columns={'iyear':'Year','imonth':'Month',
 terror_Group = terror[['Killed', 'Group']]
 terror_Location = terror[['Killed', 'Group', 'Lat', 'Long', 'Year']]
 terror_Weapon = terror[['Killed', 'Weapon_type']]
+terror_Killed = terror[['Killed']]
+terror_Country = terror[['Killed', 'Country']]
 
 #Sortera ut okänd data
 terror_Weapon =terror_Weapon[terror_Weapon.Weapon_type != 'Unknown']
@@ -48,6 +50,15 @@ terror_Location = terror_Location.groupby('Killed').agg({'Lat':'mean', 'Long':'m
 #Grupperar i killed, sen sorterar så "flest kills" hamnar högst upp.
 terror_Weapon = terror_Weapon.groupby('Killed').agg({'Weapon_type':'first', 'Killed': 'first'})
 terror_Weapon = terror_Weapon.sort_index(ascending = False)
+
+#gruppera i killed per land aka vilket land är farligast
+terror_Country = terror_Country.groupby('Killed').agg({'Country' : 'first','Killed' : 'first'})
+terror_Country = terror_Country.drop_duplicates('Country', keep='last')
+terror_Country = terror_Country.sort_index(ascending = False)
+
+
+#gruppera i killed aka räkna hur många som totalt dött
+#terror_Killed = terror_Killed.groupby('Killed')
 
 #Gör om datatyper till floats.
 terror['Year'] = terror['Year'].astype(float)
@@ -81,7 +92,12 @@ def result():
 	chart_data_location = json.dumps(chart_data_location, indent=2)
 	data_location = {'chart_data_location' : chart_data_location}
 
-	return render_template('result.html', data=data, data_group=data_group, data_location=data_location, data_weapon=data_weapon)
+	chart_data_country = terror_Country.to_dict(orient = 'records')
+	chart_data_country = json.dumps(chart_data_country, indent=2)
+	data_country= {'chart_data_country' : chart_data_country}
+
+
+	return render_template('result.html', data=data, data_group=data_group, data_location=data_location, data_weapon=data_weapon, data_country=data_country)
 
 @app.route('/bar')
 def bar():
