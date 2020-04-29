@@ -30,35 +30,39 @@ terror.rename(columns={'iyear':'Year','imonth':'Month',
 
 #Våra olika dataset
 terror_Group = terror[['Killed', 'Group']]
-terror_Location = terror[['Killed', 'Group', 'Lat', 'Long', 'Year']]
+terror_Location = terror[['Killed', 'Group', 'Lat', 'Long', 'Year', 'Weapon_type']]
 terror_Weapon = terror[['Killed', 'Weapon_type']]
 terror_Killed = terror[['Killed']]
 terror_Country = terror[['Killed', 'Country']]
+terror_Header_Wounded = terror[['Wounded']]
+terror_Header_Killed = terror[['Killed']]
+terror_Header_Target_type = terror[['Target_type', 'Killed']]
+
 
 #Sortera ut okänd data
 terror_Weapon =terror_Weapon[terror_Weapon.Weapon_type != 'Unknown']
 terror_Group =terror_Group[terror_Group.Group != 'Unknown']
+terror_Location=terror_Location[terror_Location.Killed != 0]
+terror_Location=terror_Location[terror_Location.Group != 'Unknown']
+#Tar bort tomma NaNvärden.
+terror_Location = terror_Location.dropna()
 
-#Grupperar i killed, sen sorterar så "flest kills" hamnar högst upp.
-terror_Group = terror_Group.groupby('Killed').agg({'Group':'first', 'Killed': 'first'})
-terror_Group = terror_Group.drop_duplicates('Group', keep='last')
-terror_Group = terror_Group.sort_index(ascending=False)
+#Grupperar, sen sorterar så "flest kills" hamnar högst upp.
+#GROUP
+terror_Group = terror_Group.groupby('Group').agg({'Group':'first', 'Killed': 'sum'})
+terror_Group = terror_Group.sort_values(by='Killed', ascending=False)
+#WEAPON
+terror_Weapon = terror_Weapon.groupby('Weapon_type').agg({'Weapon_type':'first', 'Killed': 'sum'})
+terror_Weapon = terror_Weapon.sort_values(by='Killed', ascending = False)
+#LOCATION
+terror_Location = terror_Location.sort_values(by='Killed', ascending=False)
+#COUNTRY
+terror_Country = terror_Country.groupby('Country').agg({'Country' : 'first','Killed' : 'sum'})
+terror_Country = terror_Country.sort_values(by = 'Killed', ascending = False)
 
-#Grupperar i killed
-terror_Location = terror_Location.groupby('Killed').agg({'Lat':'mean', 'Long':'mean', 'Group':'first', 'Killed': 'first', 'Year': 'first'})
-
-#Grupperar i killed, sen sorterar så "flest kills" hamnar högst upp.
-terror_Weapon = terror_Weapon.groupby('Killed').agg({'Weapon_type':'first', 'Killed': 'first'})
-terror_Weapon = terror_Weapon.sort_index(ascending = False)
-
-#gruppera i killed per land aka vilket land är farligast
-terror_Country = terror_Country.groupby('Killed').agg({'Country' : 'first','Killed' : 'first'})
-terror_Country = terror_Country.drop_duplicates('Country', keep='last')
-terror_Country = terror_Country.sort_index(ascending = False)
-
-
-#gruppera i killed aka räkna hur många som totalt dött
-#terror_Killed = terror_Killed.groupby('Killed')
+#För header
+terror_Header_Target_type = terror_Header_Target_type.groupby('Target_type').agg({'Target_type' : 'first','Killed' : 'sum'})
+terror_Header_Target_type = terror_Header_Target_type.sort_values(by='Killed', ascending=False)
 
 #Gör om datatyper till floats.
 terror['Year'] = terror['Year'].astype(float)
@@ -68,9 +72,10 @@ terror['Killed'] = terror['Killed'].astype(float)
 terror = terror.drop(['Month', 'Day', 'approxdate'], axis=1)
 terror = terror.groupby('Year').count().reset_index()
 
-#Tar endast med de första i antal. Obs viktigt att ej göra det på terror_location.
-terror = terror.head(48)
+#Tar endast med de första i antal. Viktigt att ta med så mkt som möjligt i location. 9000 funkar utan att lagga. 
 terror_Group = terror_Group.head(10)
+terror_Location = terror_Location.head(9000)
+terror_Weapon = terror_Weapon.head(9)
 
 app = Flask(__name__)
 
@@ -96,8 +101,13 @@ def result():
 	chart_data_country = json.dumps(chart_data_country, indent=2)
 	data_country= {'chart_data_country' : chart_data_country}
 
+	chart_data_target_type = terror_Header_Target_type.to_dict(orient = 'records')
+	chart_data_target_type = json.dumps(chart_data_target_type, indent=2)
+	data_target_type = {'chart_data_target_type' : chart_data_target_type}
 
-	return render_template('result.html', data=data, data_group=data_group, data_location=data_location, data_weapon=data_weapon, data_country=data_country)
+
+	return render_template('result.html', data=data, data_group=data_group, data_location=data_location, data_weapon=data_weapon, 
+		data_country=data_country, data_target_type=data_target_type)
 
 @app.route('/bar')
 def bar():
