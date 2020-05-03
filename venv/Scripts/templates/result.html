@@ -53,17 +53,17 @@
 			 box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 
 		}
-		div.tooltip {	
-		    position: absolute;			
-		    text-align: center;			
-		    width: 60px;					
-		    height: 28px;					
-		    padding: 2px;				
-		    font: 12px sans-serif;		
-		    background: lightsteelblue;	
-		    border: 0px;		
-		    border-radius: 8px;			
-		    pointer-events: none;			
+		div.tooltip {
+		    position: absolute;
+		    text-align: center;
+		    width: 60px;
+		    height: 28px;
+		    padding: 2px;
+		    font: 12px sans-serif;
+		    background: lightsteelblue;
+		    border: 0px;
+		    border-radius: 8px;
+		    pointer-events: none;
 		}
 		#topContainer{
 			background-color: white;
@@ -125,18 +125,22 @@
 
 			<script type="text/javascript">
 				var graphData_country = {{ data_country.chart_data_country | safe}}
-				var graphData_target= {{ data_target_type.chart_data_target_type| safe}}
+				var graphData_target= {{ data_target_type.chart_data_target_type | safe}}
+				var graphData_location = {{data_location.chart_data_l ocation | safe}}
+				var graphData_year = {{data_year.chart_data_year | safe}}
 
-				console.log(graphData_target);
+				console.log(graphData_year);
 
-				function drawTopBar(data_country, data_target){
+				function drawTopBar(data_year, data_location, data_country, data_target){
 
+					document.getElementById("topDeaths").innerHTML = "Most attacks accured in: " + data_year[0].Year + " with " + data_year[0].Killed + " deaths";
+					document.getElementById("topKilled").innerHTML = "The attack that killed most killed: " + data_location[0].Killed;
 					document.getElementById("topKilledCountry").innerHTML = "Most dangerous country is: " + data_country[0].Country + " with " + data_country[0].Killed + " deaths";
 					document.getElementById("topTargetType").innerHTML = "Most common target is: " + data_target[0].Target_type + " with " + data_target[0].Killed + " deaths";
 
 				};
 
-				drawTopBar(graphData_country, graphData_target);
+				drawTopBar(graphData_year, graphData_location, graphData_country, graphData_target);
 			</script>
 
 
@@ -154,7 +158,7 @@
 		   					//TODOLIST
 		   					//1. ge användaren möjlighet att reseta kartan --> 'knapp INTE FIXAT, kan ha missförstått haha' --> KLART
 		   					//2. Göra weapongrafen mer interaktiv. --> KLART
-		   					//3. Lägga till övergripande data under headern. --> Lagt till 1 men  de andra två behöver också fixas. 
+		   					//3. Lägga till övergripande data under headern. --> Lagt till 1 men  de andra två behöver också fixas.
 		   					//4. Lägga till ngn mer graf (?)
 
 							//Graph: Killed over years
@@ -170,7 +174,7 @@
 							var graphWidth = 460 - margin.left - margin.right;
 			    			var graphHeight = 400 - margin.top - margin.bottom;
 
-					       
+
 
 					       	function drawWeaponGraph(data){
 
@@ -201,7 +205,6 @@
 										.style("font-family", "Roboto, sans-serif")
 										.style("font-size", "10px");
 
-
 							    //Adding y-axis
 							    var y = d3.scaleBand()
 							    	.range([0, graphHeight])
@@ -215,8 +218,8 @@
 										.style("font-size", "10px");
 
 								 //Popup tooltip
-								 var div = d3.select("body").append("div")	
-								    .attr("class", "tooltip")				
+								 var div = d3.select("body").append("div")
+								    .attr("class", "tooltip")
 								    .style("opacity", 0)
 
 							    //Adding bars
@@ -232,20 +235,20 @@
 							    	.on("mouseover", function(d){
 										d3.select(this).style("fill", "rgb(206, 63, 104)");
 										d3.select(this).style("cursor", "pointer");
-										
-										div.transition()		
-							                .duration(200)		
-							                .style("opacity", .9);		
-							            div.html((d.Killed) + "<br/>"  + d.Weapon_type)	
-							                .style("left", (d3.event.pageX) + "px")		
-							                .style("top", (d3.event.pageY - 28) + "px");	 
+
+										div.transition()
+							                .duration(200)
+							                .style("opacity", .9);
+							            div.html((d.Killed) + "<br/>"  + d.Weapon_type)
+							                .style("left", (d3.event.pageX) + "px")
+							                .style("top", (d3.event.pageY - 28) + "px");
 									})
 									.on("mouseout", function(){
 										d3.select(this).style("fill", "rgba(206, 63, 104, 0.7)");
-										d3.select(this).style("cursor", "default"); 
-										div.transition()		
-							                .duration(500)		
-							                .style("opacity", 0);	
+										d3.select(this).style("cursor", "default");
+										div.transition()
+							                .duration(500)
+							                .style("opacity", 0);
 
 									})
 							    	.on("click", function(d){
@@ -255,7 +258,7 @@
 										drawMap(graphData_location, 0);
 									});
 
-					
+
 					       	}
 
 					       	drawWeaponGraph(graphData_weapon);
@@ -270,7 +273,7 @@
 
 						var graphData_location = {{data_location.chart_data_location | safe}}
 						var map = null;
-						console.log(graphData_location);
+						//console.log(graphData_location);
 
 						function clickedButton(){
 
@@ -334,7 +337,7 @@
 										    fillOpacity: 0.6
 
 									  	}).addTo(map);
-									  	
+
 									  	if(killedColor == "rgba(255, 195, 0, 0.2)"){
 									  		myMarker.bringToBack();
 									  	}
@@ -363,6 +366,7 @@
   						<p style = "color: rgba(253, 137, 112, 0.8); font-size: 14px">Use the brush to sort the data</p>
 							<p style = "font-size: 14px"> Double-click to reset brush </p>
 				</div>
+
 				<script src="https://d3js.org/d3.v4.js"></script>
 				<script src="https://d3js.org/d3-selection-multi.v0.4.min.js"></script>
 	   				<script>
@@ -486,7 +490,7 @@
 									function(d) {
 										return (d.Year >= minAxis && d.Year <=maxAxis);
 									});
-									
+
 									//Resets the map
 									drawMap(filteredNodes, 0);
 
@@ -566,7 +570,7 @@
 
 								  	});
 
-					
+
 									//Creating the table
 									var table = d3.select("#Tabulate").append("table")
 									.attr("width", graphWidth)
@@ -602,11 +606,11 @@
 										})
 										.on("mouseover", function(){
 										    d3.select(this).style("background-color", "rgba(88, 24, 69, 0.2)");
-										    d3.select(this).style("cursor", "pointer"); 
+										    d3.select(this).style("cursor", "pointer");
 										  })
 										.on("mouseout", function(){
 										   d3.select(this).style("background-color", "white");
-										   d3.select(this).style("cursor", "default"); 
+										   d3.select(this).style("cursor", "default");
 										})
 										.on("dblclick", function(){
 											drawMap(graphData_location, 0);

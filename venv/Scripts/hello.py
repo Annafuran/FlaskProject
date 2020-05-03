@@ -35,8 +35,9 @@ terror_Weapon = terror[['Killed', 'Weapon_type']]
 terror_Killed = terror[['Killed']]
 terror_Country = terror[['Killed', 'Country']]
 terror_Header_Wounded = terror[['Wounded']]
-terror_Header_Killed = terror[['Killed']]
+terror_Header_Killed = terror[['Killed']] #kan ta bort denna?
 terror_Header_Target_type = terror[['Target_type', 'Killed']]
+terror_Year = terror[['Killed', 'Year']]
 
 
 #Sortera ut okänd data
@@ -59,6 +60,9 @@ terror_Location = terror_Location.sort_values(by='Killed', ascending=False)
 #COUNTRY
 terror_Country = terror_Country.groupby('Country').agg({'Country' : 'first','Killed' : 'sum'})
 terror_Country = terror_Country.sort_values(by = 'Killed', ascending = False)
+#YEAR
+terror_Year = terror_Year.groupby('Year').agg({'Year' : 'first', 'Killed' : 'sum'})
+terror_Year = terror_Year.sort_values(by = 'Killed', ascending = False)
 
 #För header
 terror_Header_Target_type = terror_Header_Target_type.groupby('Target_type').agg({'Target_type' : 'first','Killed' : 'sum'})
@@ -72,7 +76,7 @@ terror['Killed'] = terror['Killed'].astype(float)
 terror = terror.drop(['Month', 'Day', 'approxdate'], axis=1)
 terror = terror.groupby('Year').count().reset_index()
 
-#Tar endast med de första i antal. Viktigt att ta med så mkt som möjligt i location. 9000 funkar utan att lagga. 
+#Tar endast med de första i antal. Viktigt att ta med så mkt som möjligt i location. 9000 funkar utan att lagga.
 terror_Group = terror_Group.head(10)
 terror_Location = terror_Location.head(9000)
 terror_Weapon = terror_Weapon.head(9)
@@ -105,9 +109,13 @@ def result():
 	chart_data_target_type = json.dumps(chart_data_target_type, indent=2)
 	data_target_type = {'chart_data_target_type' : chart_data_target_type}
 
+	chart_data_year = terror_Year.to_dict(orient = 'records')
+	chart_data_year = json.dumps(chart_data_year, indent=2)
+	data_year= {'chart_data_year' : chart_data_year}
 
-	return render_template('result.html', data=data, data_group=data_group, data_location=data_location, data_weapon=data_weapon, 
-		data_country=data_country, data_target_type=data_target_type)
+	#Skicka alla varabler
+	return render_template('result.html', data=data, data_group=data_group, data_location=data_location, data_weapon=data_weapon,
+		data_country=data_country, data_target_type=data_target_type, data_year=data_year)
 
 @app.route('/bar')
 def bar():
